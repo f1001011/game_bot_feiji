@@ -5,9 +5,9 @@ namespace app\model;
 use app\common\CacheKey;
 use think\facade\Cache;
 
-class UserModel extends BaseModel
+class CommandLogModel extends BaseModel
 {
-    public $table = 'users';
+    public $table = 'tg_command_log';
 
 
 

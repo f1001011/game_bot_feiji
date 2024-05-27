@@ -2,9 +2,9 @@
 
 namespace app\model;
 
-class LotteryJoinUserModel extends BaseModel
+class UserDataModel extends BaseModel
 {
-    public $table = 'lottery_join_user';
+    public $table = 'tg_user_data';
 
 
 

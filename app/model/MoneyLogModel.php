@@ -5,7 +5,7 @@ namespace app\model;
 class MoneyLogModel extends BaseModel
 {
     //用户金额消费记录日志
-    public $table = 'money_log';
+    public $table = 'tg_money_log';
 
     public function setInsert($data)
     {
