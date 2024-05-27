@@ -23,6 +23,16 @@ function traceLog($message, $lv = '')
     trace($message, $lv . '-RESPONSE_ID:' . REQUEST_ID);
 }
 
+function traceLogs($message, $lv = 'info', $channel = 'job')
+{
+    if (is_array($message)){
+        $message['RESPONSE_ID'] = REQUEST_ID;
+        $message = json_encode($message);
+    }else{
+        $message .= '-RESPONSE_ID:' . REQUEST_ID;
+    }
+    \think\facade\Log::channel($channel)->$lv($message);
+}
 
 //生成token
 function token($length = 10)
