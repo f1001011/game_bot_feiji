@@ -25,9 +25,9 @@ return [
             // 单文件日志写入
             'single'         => false,
             // 独立日志级别
-            'apart_level'    => [],
+            'apart_level'    => ['sql'],
             // 最大日志文件数量
-            'max_files'      => 0,
+            'max_files'      => 30,
             // 使用JSON格式记录
             'json'           => false,
             // 日志处理
@@ -38,6 +38,39 @@ return [
             'format'         => '[%s][%s] %s',
             // 是否实时写入
             'realtime_write' => true,
+            //日志文件大小限制（超出会生成多个文件）
+            'file_size'=>1024*1024,
+            //时间记录格式
+            'time_format'=>'Y-m-d H:i:s',
+        ],
+        'job' => [
+            // 日志记录方式
+            'type'           => 'File',
+            // 日志保存目录
+            'path'           => app()->getRootPath().'/runtime/job',
+            // 单文件日志写入
+            'single'         => false,
+            // 独立日志级别
+            'apart_level'    => [],
+            // 最大日志文件数量
+            'max_files'      => 30,
+            // 使用JSON格式记录
+            'json'           => false,
+            // 日志处理
+            'processor'      => null,
+            // 关闭通道日志写入
+            'close'          => false,
+            // 日志输出格式化
+            'format'         => '[%s][%s] %s',
+            // 是否实时写入
+            'realtime_write' => true,
+            //日志文件大小限制（超出会生成多个文件）
+            'file_size'=>1024*1024,
+            //时间记录格式
+            'time_format'=>'Y-m-d H:i:s',
+        ],
+        'sql'    =>    [
+            'type'    =>    'sql',
         ],
         // 其它日志通道配置
     ],

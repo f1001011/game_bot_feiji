@@ -1,100 +1,280 @@
 <?php
-// 应用公共文件
 
-function success(array $data = [], $message = 'message', int $code = 200)
+namespace app\facade\bin;
+
+
+class TelegramBotBin extends BaseFacade
 {
-    echo json_encode(['data' => $data, 'message' => $message, 'code' => $code]);
-    die;
-}
+    private static $url;
 
-function fail(array $data = [], $message = 'message', int $code = 500)
-{
-    echo json_encode(['data' => $data, 'message' => $message, 'code' => $code]);
-    die;
-}
-
-function language(string $name = '')
-{
-    return lang($name);
-}
-
-function traceLog($message, $lv = '')
-{
-    trace($message, $lv . '-RESPONSE_ID:' . REQUEST_ID);
-}
-
-
-//生成token
-function token($length = 10)
-{
-    $characters       = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $charactersLength = strlen($characters);
-    $randomString     = '';
-    $randomBytes      = random_bytes($length);
-
-    for ($i = 0; $i < $length; $i++) {
-        $randomString .= $characters[ord($randomBytes[$i]) % $charactersLength];
+    public function __construct($u = '')
+    {
+        self::$url = empty($u) ? config('telegram.one.bot-url') : $u;
     }
 
-    return $randomString;
-}
-
-function tgPostgSign($data = [], $secret = 'ab50831ca94d0f97ff679495abfae0f7')
-{
-    //升序排列
-    ksort($data);
-    $queryString = urldecode(http_build_query($data));
-
-    if (!empty($secret)) {
-        $queryString = $queryString . '&secret=' . $secret;
+    public static function stores($url) {
+        return new self($url);
     }
-    $md5 = md5($queryString);
-    return strtolower($md5);
-}
 
-function betPostData($data){
-    //组装下注数据请求
-    $bet = json_encode($data['bet']);
-    //base64
-    $bet = base64_encode($bet);
-    $data['bet'] = $bet;
-    $data['sign'] = tgPostgSign($data);
-    return $data;
-}
-
-
-function curlPost(string $url, array $post_data = [], $type = 'http_build_query', $header = [])
-{
-    if (empty($url)) {
-        return false;
+    //绑定域名
+    public static function setWebhookPost()
+    {
+        $url = self::$url . 'setWebhook?url=' . config('telegram.bot-binding-url-one');
+        $response = curlPost($url);
+        return $response;
     }
-    if ($type == 'json') {
-        $post_data = json_encode($post_data);
-        $header = [
-            'Content-Type: application/json',
-            'Content-Length: ' . strlen($post_data)
+
+    public static function setWebhookDeletePost()
+    {
+        $url = self::$url . 'deleteWebhook';
+        $response = curlPost($url);
+        return $response;
+    }
+
+    public function getChats()
+    {
+        $url = self::$url . 'getChats';
+        $response = curlPost($url);
+        return $response;
+    }
+
+    //获取绑定信息
+    public static function getWebhookPostInfo()
+    {
+        $url = self::$url . 'getWebhookInfo';
+        $response = curlPost($url);
+        return $response;
+    }
+
+    //发送图片文件
+    public static function sendPhoto($chatId, $photoPath, $caption = '你好欢迎来使用机器人', $keyboard = [])
+    {
+        // 创建一个 cURL 句柄
+        $ch = curl_init();
+        // 设置请求的 URL
+        $url = self::$url . 'sendPhoto';
+
+        // 创建一个包含要发送的字段的数组
+        $postFields = [
+            'chat_id' => $chatId,
+            'photo' => new \CURLFile($photoPath), // 使用 CURLFile 发送本地文件
+            'parse_mode' => 'HTML'
         ];
-    } else {
-        $post_data = http_build_query($post_data);
+
+        if (!empty($caption)) {
+            $postFields['caption'] = $caption;
+        }
+        // 将键盘编码为JSON
+        if (!empty($keyboard)) {
+            $postFields['reply_markup'] = json_encode(['inline_keyboard' => $keyboard]);
+        }
+
+        // 设置 cURL 选项
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 1); // 发送 POST 请求
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields); // 设置 POST 字段
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // 将返回结果保存到变量中，而不是直接输出
+        curl_setopt($ch, CURLOPT_SAFE_UPLOAD, true); // 在 PHP 5.6.0+ 中启用安全文件上传
+
+        // 发送请求并获取响应
+        $response = curl_exec($ch);
+        // 检查是否有错误发生
+        if (curl_errno($ch)) {
+            traceLog(curl_error($ch), 'sendPhoto error');
+        }
+        // 关闭 cURL 句柄
+        curl_close($ch);
+        // 输出响应结果
+        traceLog($response, 'sendPhoto');
+        return $response;
     }
-    $curl = curl_init();// 启动一个CURL会话
-    curl_setopt($curl, CURLOPT_URL, $url);// 要访问的地址
-    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);// 对认证证书来源的检查
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);// 从证书中检查SSL加密算法是否存在
-    //    curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);// 模拟用户使用的浏览器
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);// 使用自动跳转
-    curl_setopt($curl, CURLOPT_AUTOREFERER, 1);// 自动设置Referer
-    curl_setopt($curl, CURLOPT_POST, 1);// 发送一个常规的Post请求
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);// Post提交的数据包
-    curl_setopt($curl, CURLOPT_TIMEOUT, 30);// 设置超时限制防止死循环
-    curl_setopt($curl, CURLOPT_HEADER, 0);// 显示返回的Header区域内容
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);// 获取的信息以文件流的形式返回
-    curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-    $data = curl_exec($curl);//运行curl
-    if (curl_errno($curl)) {
-        trace(curl_error($curl), 'error');
+
+    public static function sendPhotoEdit($chatId, $photoPath, $caption = '你好欢迎来使用机器人', $keyboard = [], $messageId = 0)
+    {
+        // 删除旧消息
+        if ($messageId > 0) {
+            $deleteUrl = self::$url . "deleteMessage";
+            $deleteData = [
+                'chat_id' => $chatId,
+                'message_id' => $messageId,
+                'parse_mode' => 'HTML'
+            ];
+
+            $ch = curl_init($deleteUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($deleteData));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            $deleteResult = curl_exec($ch);
+            curl_close($ch);
+        }
+
+        // 创建一个 cURL 句柄
+        $ch = curl_init();
+        // 设置请求的 URL
+        $url = config('telegram.bot-url') . 'sendPhoto';
+
+        // 创建一个包含要发送的字段的数组
+        $postFields = [
+            'chat_id' => $chatId,
+            'photo' => new \CURLFile($photoPath), // 使用 CURLFile 发送本地文件
+        ];
+
+        if (!empty($caption)) {
+            $postFields['caption'] = $caption;
+        }
+        // 将键盘编码为JSON
+        if (!empty($keyboard)) {
+            $postFields['reply_markup'] = json_encode(['inline_keyboard' => $keyboard]);
+        }
+
+        // 设置 cURL 选项
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 1); // 发送 POST 请求
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields); // 设置 POST 字段
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // 将返回结果保存到变量中，而不是直接输出
+        curl_setopt($ch, CURLOPT_SAFE_UPLOAD, true); // 在 PHP 5.6.0+ 中启用安全文件上传
+
+        // 发送请求并获取响应
+        $response = curl_exec($ch);
+        // 检查是否有错误发生
+        if (curl_errno($ch)) {
+            traceLog(curl_error($ch), 'sendPhoto error');
+        }
+        // 关闭 cURL 句柄
+        curl_close($ch);
+        // 输出响应结果
+        traceLog($response, 'sendPhoto');
+        return $response;
     }
-    curl_close($curl);
-    trace($data, 'info');
-    return $data;
+
+    public static function sendWebhookEdit($chatId, $messageId, $message)
+    {
+        // 构造请求的 URL
+        $url = self::$url . 'editMessageText?' . "chat_id={$chatId}&message_id={$messageId}&text={$message}";
+        // 初始化 cURL
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // 执行请求并获取响应
+        $response = curl_exec($ch);
+        // 检查是否有错误发生
+        if (curl_errno($ch)) {
+            traceLog(curl_error($ch), 'sendWebhookEdit error');
+        }
+        // 关闭 cURL 资源
+        curl_close($ch);
+        // 处理响应（如果需要）
+        traceLog($response, 'sendWebhookEdit');
+        return $response;
+    }
+
+    /**
+     * @param $chatId
+     * @param $text
+     */
+    public static function sendMessage($chatId, $message)
+    {
+        // 构造请求的 URL
+        $url = self::$url . 'sendMessage?' . "chat_id={$chatId}&text={$message}";
+        // 初始化 cURL
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // 执行请求并获取响应
+        $response = curl_exec($ch);
+        // 检查是否有错误发生
+        if (curl_errno($ch)) {
+            traceLog(curl_error($ch), 'sendWebhookEdit error');
+        }
+        // 关闭 cURL 资源
+        curl_close($ch);
+        traceLog($response, 'sendWebhookEdit');
+        // 处理响应（如果需要）
+        return $response;
+    }
+
+    //发送点击内联菜单的弹出框  $callbackQueryId 回调ID  $message 消息内容
+    public static function SendCallbackQuery($callbackQueryId, $message)
+    {
+        // 发送一个answerCallbackQuery响应来确认查询
+        $answerCallbackQuery = [
+            'callback_query_id' => $callbackQueryId,
+            'text' => $message, // 这将作为Telegram客户端的提示显示（如果'show_alert'设置为true）
+            'show_alert' => true, // 设置为true将在Telegram客户端中显示一个提示
+            'parse_mode' => 'HTML'
+        ];
+        $url = config('Telegram.bot-url') . "answerCallbackQuery";
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($answerCallbackQuery));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if (curl_errno($ch)) {
+            traceLog(curl_error($ch), 'sendWebhookEdit error');
+        }
+        // 关闭 cURL 资源
+        curl_close($ch);
+        traceLog($response, 'sendWebhookEdit');
+        // 处理响应（如果需要）
+        return $response;
+    }
+
+    //修改内联键盘按钮
+    public static function editMessageReplyMarkup($chatId, $messageId, $keyboard)
+    {
+        $encodedKeyboard = [];
+        if (!empty($keyboard)) {
+            $encodedKeyboard = json_encode(['inline_keyboard' => $keyboard]);
+        }
+
+        // 发送一个空消息，只包含内联键盘
+        $editMessageUrl = config('Telegram.bot-url') . "editMessageReplyMarkup";
+        $postFields = [
+            'chat_id' => $chatId,
+            'message_id' => $messageId, // 注意：这里应该是新的message_id，因为你将发送一个新消息
+            'reply_markup' => $encodedKeyboard,
+            'parse_mode' => 'HTML'
+        ];
+        $ch = curl_init($editMessageUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+        $response = curl_exec($ch);
+        if (curl_errno($ch)) {
+            traceLog(curl_error($ch), 'editMessageReplyMarkup error');
+        }
+        curl_close($ch);
+        traceLog($response, 'editMessageReplyMarkup');
+        // 处理响应（如果需要）
+        return $response;
+    }
+
+    //修改发送图片消息和内联键盘
+    public static function editMessageCaption($chatId = 0, $messageId = 0, $message = '', $keyboard = '')
+    {
+        // 发送一个空消息，只包含内联键盘
+        $editMessageUrl = self::$url . "editMessageCaption";
+        $postFields = [
+            'chat_id' => $chatId,
+            'message_id' => $messageId,
+            'caption' => $message,
+            'parse_mode' => 'HTML'
+        ];
+        if (!empty($keyboard)) {
+            $postFields['reply_markup'] = json_encode(['inline_keyboard' => $keyboard]);
+        }
+
+        $ch = curl_init($editMessageUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+        $response = curl_exec($ch);
+        if (curl_errno($ch)) {
+            traceLog(curl_error($ch), 'editMessageCaption error');
+        }
+        curl_close($ch);
+        traceLog($response, 'editMessageCaption');
+        // 处理响应（如果需要）
+        return $response;
+    }
 }
