@@ -77,7 +77,7 @@ class TelegramBot extends BaseApiController
         //1 判断输入的命令/
         //获取群号判断是 那个游戏
         if ($crowd == '百家乐群号'){
-         //调用百家乐游戏下注
+            //调用百家乐游戏下注
         }
 
         if ($crowd == '龙湖斗群号'){
@@ -159,16 +159,17 @@ class TelegramBot extends BaseApiController
             'crowd' => $chat['id'],
             'command' => $command,
             'tg_id' => $from['id'],
-            ],
+        ],
             'command-webhook-data');
 
         //先判断 命令是否正确，开始第一位 /zd/100 xd/100，字符串出现的次数始终是单数
-        $commandCount = substr_count($command, '/');
-        if ($commandCount % 2 != 1) {
-            //表示发送的数据不对
-            BotFacade::sendMessage($chat['id'],"用户{$from['username']}发送的数据 {$command} 格式错误");
-            return;
-        }
+        // $commandCount = substr_count($command, '/');
+
+        // if ($commandCount % 2 != 1) {
+        //     //表示发送的数据不对
+        //     BotFacade::sendMessage($chat['id'],"用户{$from['username']}发送的数据 {$command} 格式错误");
+        //     return;
+        // }
         //判断是否是下注信息格式 /zd/100 xd/100
         //去除第一个 /
         $command = substr($command, 1);

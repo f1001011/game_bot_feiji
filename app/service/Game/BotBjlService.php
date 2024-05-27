@@ -36,7 +36,6 @@ class BotBjlService extends BaseGameService
             $res = [];
             //1 获取下注台座
             $tableId = 0;
-
             //3 获取下注比例 ID
 
             if (!isset(GameModel::BJL_ODDS[$value[0]])){
@@ -68,7 +67,7 @@ class BotBjlService extends BaseGameService
             $this->sendMessage($crowd,$tgUser['username'].' 下注失败');
             return false;
         }
-        
+
         //解析json
         //tguser -- 下注成功--原因
         $this->analysisBetResponse($res,$crowd,$tgUser);

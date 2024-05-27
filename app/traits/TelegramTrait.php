@@ -4,6 +4,7 @@ namespace app\traits;
 
 //飞机配置
 use app\common\CacheKey;
+use app\facade\BotFacade;
 use app\model\LotteryJoinUserModel;
 use app\model\UserModel;
 use think\Exception;
@@ -51,14 +52,14 @@ trait TelegramTrait
     }
 
     
-    protected function analysisBetResponse($data,$crowdId,$tgUser){
-//         $data = json_decode($json,true);
-//        if ($data['code'] == 200){
-//            botFacade::sendMessage($crowd,$tgUser['username'].' 下注成功');
-//            return false;
-//        }
+    protected function analysisBetResponse($json,$crowdId,$tgUser){
+         $data = json_decode($json,true);
+        if ($data['code'] == 200){
+            BotFacade::sendMessage($crowdId,$tgUser['username'].' 下注成功');
+            return true;
+        }
 //    //返回错误信息
-//    botFacade::sendMessage($crowd,$tgUser['username'].'下注成功'."\n".$data['message']);
+    botFacade::sendMessage($crowdId,$tgUser['username'].'下注失败'."\n".$data['message']);
     return true;
     }
 }

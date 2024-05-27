@@ -12,7 +12,8 @@ class TelegramBotBin extends BaseFacade
         self::$url = empty($u) ? config('telegram.one.bot-url') : $u;
     }
 
-    public static function stores($url) {
+    public static function stores($url)
+    {
         return new self($url);
     }
 
@@ -171,22 +172,37 @@ class TelegramBotBin extends BaseFacade
      * @param $chatId
      * @param $text
      */
-    public static function sendMessage($chatId, $message)
+    public static function sendMessage($chatId, $message, $keyboard = [])
     {
-        // 构造请求的 URL
-        $url = self::$url . 'sendMessage?' . "chat_id={$chatId}&text={$message}";
+        // 初始化 cURL
+        $url = self::$url . 'sendMessage';
+        // 将键盘编码为JSON
+        // 准备 POST 数据
+        $postData = array(
+            'chat_id' => $chatId,
+            'text' => $message,
+            'parse_mode' => 'HTML',
+        );
+
+        if (!empty($keyboard)) {
+            $postData['reply_markup'] = json_encode(['inline_keyboard' => $keyboard]);
+        }
         // 初始化 cURL
         $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // 执行请求并获取响应
+
+        // 发送请求并获取响应
         $response = curl_exec($ch);
         // 检查是否有错误发生
-        if (curl_errno($ch)) {
-            traceLog(curl_error($ch), 'sendWebhookEdit error');
+        if ($response === false) {
+            traceLog(curl_error($ch), 'sendMessage error');
         }
+
         // 关闭 cURL 资源
         curl_close($ch);
-        traceLog($response, 'sendWebhookEdit');
+        traceLog($response, 'sendMessage');
         // 处理响应（如果需要）
         return $response;
     }
