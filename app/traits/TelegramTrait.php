@@ -14,14 +14,15 @@ trait TelegramTrait
     //获取主菜单
     public function sendRrdBotRoot(string $param = '', string $crowd = '')
     {
-        $string = "获取本局结果"; //$param 唯一标识
-
-        $one = [
-            [
-                ['text' => $string, 'callback_data' => 'tables_'. $param],
-            ],
-        ];
-        return array_merge($one, $this->menu());
+//        $string = "获取本局结果"; //$param 唯一标识
+//
+//        $one = [
+//            [
+//                ['text' => $string, 'callback_data' => 'tables_'. $param],
+//            ],
+//        ];
+//        return array_merge($one, $this->menu());
+        return $this->menu();
     }
 
 
@@ -37,27 +38,27 @@ trait TelegramTrait
     {
         return [
             [
-                ['text' => '联系客服', 'url' => "https://t.me/red_app_test_bot/myRedTestName"],
-                ['text' => '游戏充值', 'url' => 'https://t.me/red_app_test_bot/myRedTestName?id=123321'],
-                ['text' => '提取奖金', 'url' => 'https://t.me/red_app_test_bot/myRedTestName?id=123321'],
+                ['text' => '百家乐一群', 'url' => "https://t.me/red_app_test_bot"],
+                ['text' => '百家乐二群', 'url' => 'https://t.me/red_app_test_bot'],
+                ['text' => '百家乐三群', 'url' => 'https://t.me/red_app_test_bot'],
             ],
             [
                 ['text' => '开牌记录', 'callback_data' => 'openLog'],
                 ['text' => '下注记录', 'callback_data' => 'betLog'],
-                ['text' => '更多游戏', 'url' => 'https://t.me/red_app_test_bot/myRedTestName?id=123321'],
+                ['text' => '更多游戏', 'url' => 'https://t.me/red_app_test_bot'],
             ],
         ];
     }
 
     
     protected function analysisBetResponse($data,$crowdId,$tgUser){
-         $data = json_decode($json,true);
-        if ($data['code'] == 200){
-            botFacade::sendMessage($crowd,$tgUser['username'].' 下注成功');
-            return false;
-        }
-    //返回错误信息
-    botFacade::sendMessage($crowd,$tgUser['username'].'下注成功'."\n".$data['message']);
+//         $data = json_decode($json,true);
+//        if ($data['code'] == 200){
+//            botFacade::sendMessage($crowd,$tgUser['username'].' 下注成功');
+//            return false;
+//        }
+//    //返回错误信息
+//    botFacade::sendMessage($crowd,$tgUser['username'].'下注成功'."\n".$data['message']);
     return true;
     }
 }

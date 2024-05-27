@@ -50,6 +50,13 @@ class TelegramBot extends BaseApiController
         //判断是否是新消息。机器人加入房间消息
         $this->botCrowd($request);
 
+        //判断是否是系统命令,是的话直接弹出菜单
+
+        //判断是否新用户加入群中,是的话绑定用户到群 建立数据库 用户加入房间数据库
+
+
+
+
         if (empty($request) || empty($request['callback_query']['message'])) {
             // 消息体错误
             traceLog($request, 'red-webhook-error');
@@ -123,6 +130,7 @@ class TelegramBot extends BaseApiController
         return true;
     }
 
+    //判断是否是系统命令
     public function systemCommand($request){
 
         if (empty($request) || empty($request['message']['text'])) {

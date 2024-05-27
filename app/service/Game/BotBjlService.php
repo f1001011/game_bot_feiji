@@ -3,8 +3,11 @@
 namespace app\service\Game;
 
 
+use app\common\CacheKey;
+use app\facade\BotFacade;
 use app\model\GameModel;
 use app\facade\GameFacade;
+use think\facade\Cache;
 
 class BotBjlService extends BaseGameService
 {
@@ -14,7 +17,7 @@ class BotBjlService extends BaseGameService
      * @param string $type /下注游戏
      * @param string $rateId /下注ID /赔率ID
      */
-    public function Betting(string $command,string $crowd,string $tgUser)
+    public function Betting(string $command,string $crowd,array $tgUser)
     {
 
         // zy/100&xy/100&hy/100
@@ -27,7 +30,7 @@ class BotBjlService extends BaseGameService
         }
 
         //便利组装下注信息
-        $tgID = $tgUserId;
+        $tgID = $tgUser['id'];
         $post = [];
         foreach ($array as $key=>$value){
             $res = [];
@@ -85,5 +88,62 @@ class BotBjlService extends BaseGameService
     {
         //开牌发送开牌信息
         //发送开奖盈亏
+    }
+
+
+    //发送台座开始下注信息
+    public function startSend($urlsWithData){
+        //1 组装数据 把 json 数组取出来，用作redis 删除指定值
+
+        //2 调用 接口发送信息
+        $redisKey = CacheKey::BOT_TELEGRAM_TABLE_SEND_INFO;
+        //发起数据请求发送到tg
+        // 需要发送的 URL 和对应的 POST 数据
+
+        // 初始化 cURL 多句柄
+        $multiHandle = curl_multi_init();
+
+        // 用于跟踪句柄和 URL 的关联数组
+        $curlHandles = [];
+
+        // 初始化每个请求的 cURL 句柄并添加到多句柄
+        foreach ($urlsWithData as $requests) {
+            $ch = curl_init($requests['url']);
+            // 设置 cURL 选项
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($requests['data']));
+            // 将 cURL 句柄和 URL 添加到跟踪数组中
+            $curlHandles[$ch] = ['url' => $requests['url'], 'response' => null];
+            // 将 cURL 句柄添加到多句柄
+            curl_multi_add_handle($multiHandle, $ch);
+        }
+
+        // 执行多句柄请求
+        $running = null;
+        do {
+            curl_multi_exec($multiHandle, $running);
+        } while ($running > 0);
+
+        // 获取并处理每个请求的响应
+        foreach ($curlHandles as $ch => $info) {
+            $responses        = curl_multi_getcontent($ch);
+            $info['response'] = $responses; // 将响应存储到跟踪数组中
+
+            // 在这里处理你的响应。例如打印、存储等，
+            //echo "Response for {$info['url']}: \n{$responses}\n\n";
+            traceLog([$info,$responses]);
+            //成功删除指定的 redis信息   获取指定的url
+            //Cache::LREM($redisKey, 0, $value);
+
+            // 清理句柄
+            curl_multi_remove_handle($multiHandle, $ch);
+            curl_close($ch);
+            // 可以选择从 $curlHandles 数组中移除已处理的句柄和信息
+            unset($curlHandles[$ch]);
+        }
+        // 关闭多句柄
+        curl_multi_close($multiHandle);
+
     }
 }

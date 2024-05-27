@@ -34,44 +34,5 @@ class LotteryJoinModel extends BaseModel
 
 
 
-    //REDIS_RED_ID_CREATE_SENG_INFO
-    //创建成功写入redis信息
-    public function setInsert($data)
-    {
-        $data['created_at'] = date('Y-m-d H:i:s');
-        $data['updated_at'] = date('Y-m-d H:i:s');
-        $id = $this->insertGetId($data);
-        //写入缓存
-        if ($id) {
-            Cache::set(sprintf(CacheKey::REDIS_RED_ID_CREATE_SENG_INFO, $id), json_encode($data), CacheKey::REDIS_RED_ID_CREATE_SENG_INFO_TTL);
-        }
-        return $id;
-    }
 
-    //获取创建的信息缓存
-    public function getCacheCreateInfo($id)
-    {
-        if ($id <= 0) {
-            return [];
-        }
-        $key = CacheKey::REDIS_RED_ID_CREATE_SENG_INFO;
-        $data = Cache::get(sprintf($key, $id));
-        if (!empty($data)) {
-            return json_decode($data, true);
-        }
-        //查询数据并返回
-        $data = $this->where('id', $id)->find();
-        if (empty($data)) {
-            return [];
-        }
-        Cache::set(sprintf($key, $id), json_encode($data), CacheKey::REDIS_RED_ID_CREATE_SENG_INFO_TTL);
-        return $data;
-    }
-
-    //获取创建 没发送出去的红包
-    public function getCacheCreateInfoList(){
-        $list = $this->where('status',LotteryJoinModel::STATUS_HAVE)->select()->toArray();
-        //
-        return$list;
-    }
 }

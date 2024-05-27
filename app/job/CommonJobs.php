@@ -19,7 +19,7 @@ class CommonJobs
         $this->send($name);
         // 如果邮件发送成功，则删除任务
         $job->delete();
-        traceLogs($name . ' 执行END');
+        traceLog($name . ' 执行END');
         // 也可以记录日志等
     }
 
@@ -30,12 +30,12 @@ class CommonJobs
         }
         traceLog($name . ' 开始执行任务---' . $name . '---START');
         //判断需要执行的命令
-        switch ($name) {//自动结束 已经结束的红包状态，redautoclose
+        switch ($name) {//
             case JobKey::BJL_OPEN:
                 break;
 
             case JobKey::BJL_START:
-
+                    //百家乐开始信息
                 break;
             case JobKey::NN_OPEN:
 

@@ -3,10 +3,13 @@
 namespace app\service\Game;
 
 use app\service\BaseService;
+use app\traits\RedBotTrait;
+use app\traits\TelegramTrait;
 
 class BaseGameService extends BaseService
 {
-
+    use RedBotTrait;
+    use TelegramTrait;
     public function commandAnalysis($command){
 
         if (!strpos($command, '/')) {
@@ -49,5 +52,6 @@ class BaseGameService extends BaseService
         //发送tgID 获取用户 token
         //
     }
+
 
 }
