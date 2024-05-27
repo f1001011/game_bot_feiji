@@ -27,7 +27,7 @@ class GameStartBetCmd extends Command
         $redisKey = CacheKey::BOT_TELEGRAM_TABLE_SEND_INFO;
         $num      = Cache::LLEN($redisKey);
         if ($num <= 0) {
-            $output->writeln('gamestartbetcmd  ---目前没有开牌信息---');
+            $output->writeln('gamestartbetcmd  ---目前没有开始下注信息---');
             return false;
         }
         //1 循环查询开拍信息

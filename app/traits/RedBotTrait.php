@@ -13,7 +13,7 @@ use think\facade\Cache;
 trait RedBotTrait
 {
 
-    //获取游戏类型的红包
+    //获取游戏类型的图片
     protected function verifySetSend($gameType, $isOpen = false)
     {
         switch ($gameType) {

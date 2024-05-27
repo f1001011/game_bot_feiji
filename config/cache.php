@@ -6,7 +6,7 @@
 
 return [
     // 默认缓存驱动
-    'default' => env('cache.driver', 'file'),
+    'default' => env('cache.driver', 'redis'),
 
     // 缓存连接方式配置
     'stores'  => [
@@ -25,16 +25,18 @@ return [
             'serialize'  => [],
         ],
         // 更多的缓存连接
-        'redis' => [
+        'redis'   =>  [
             // 驱动方式
-            'type'       => 'redis',
-            'host'       => '127.0.0.1',
-            // 缓存前缀
-            'prefix'     => '',
-            // 缓存有效期 0表示永久缓存
-            'expire'     => 0,
-            'password'     => '',
-
+            'type'   => 'redis',
+            // 服务器地址
+            'host'       => env('redis.redis_host', '127.0.0.1'),
+            'password'       => env('redis.redis_password', ''),
+            // 默认使用的数据库索引号
+            'select' => env('redis.redis_select', 3),
+            // 是否持久化连接
+            'persistent' => false,
+            // Redis连接的前缀，用于区分不同的应用
+            'prefix' => '',
         ],
     ],
 ];
