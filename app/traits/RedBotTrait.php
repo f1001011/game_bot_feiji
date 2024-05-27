@@ -39,7 +39,7 @@ trait RedBotTrait
             $open = 'open';
         }
 
-        $photoUrl = public_path() . config("bot-binding-{$photo}-{$open}-photo-one");
+        $photoUrl = public_path() . config("telegram.one.bot-binding-{$photo}-{$open}-photo-one");
         if (!file_exists($photoUrl)) {
             return fail([], '红包图片不存在');
         }
