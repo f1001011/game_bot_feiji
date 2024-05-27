@@ -16,7 +16,6 @@ trait RedBotTrait
     //获取游戏类型的红包
     protected function verifySetSend($gameType, $isOpen = false)
     {
-
         switch ($gameType) {
             case GameModel::BJL_TYPE:
                 $photo = 'bjl';
@@ -45,6 +44,12 @@ trait RedBotTrait
         }
 
         return [$photoUrl];
+    }
+
+    public function getCrowdPhoto($crowdId=''){
+        //获取群图片
+        $photoUrl = public_path() . config("telegram.one.bot-binding-bjl-photo-one");
+        return $photoUrl;
     }
 
 }
