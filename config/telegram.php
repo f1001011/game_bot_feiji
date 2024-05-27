@@ -7,15 +7,15 @@ return [
         'bot-binding-url-one'=>"https://tg_bot.bigtelegram.com/bot/webhook",//绑定接口地址
 
         'bot-binding-red-string-one'     => 'tables_',
-        'bot-binding-bjl-photo-one'  => 'static/12.png',//百家乐欢迎光临图片
-        'bot-binding-bjl-start-photo-one'   => 'static/12.png',//百家乐开始投注图片
-        'bot-binding-bjl-open-photo-one'    => 'static/12.png',//百家乐结束投注图片
-        'bot-binding-nn-start-photo-one'    => 'static/12.png',
-        'bot-binding-nn-open-photo-one'     => 'static/12.png',
-        'bot-binding-lh-start-photo-one'    => 'static/12.png',
-        'bot-binding-lh-open-photo-one'     => 'static/12.png',
-        'bot-binding-three-start-photo-one' => 'static/12.png',
-        'bot-binding-three-open-photo-one'  => 'static/12.png',
+        'bot-binding-bjl-photo-one'  => 'static/fl.jpg',//百家乐欢迎光临图片
+        'bot-binding-bjl-start-photo-one'   => 'static/fl.jpg',//百家乐开始投注图片
+        'bot-binding-bjl-open-photo-one'    => 'static/fl.jpg',//百家乐结束投注图片
+        'bot-binding-nn-start-photo-one'    => 'static/fl.jpg',
+        'bot-binding-nn-open-photo-one'     => 'static/fl.jpg',
+        'bot-binding-lh-start-photo-one'    => 'static/fl.jpg',
+        'bot-binding-lh-open-photo-one'     => 'static/fl.jpg',
+        'bot-binding-three-start-photo-one' => 'static/fl.jpg',
+        'bot-binding-three-open-photo-one'  => 'static/fl.jpg',
     ],
     'bjl_crowd'         => [ //群号=》台座
         '-1001' => 2,
