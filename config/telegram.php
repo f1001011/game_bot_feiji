@@ -1,6 +1,6 @@
 <?php
 
-$BOT_TOKEN = '7486843033:AAGX1CrQz1JDQRiixIe8-R_50_9Goms44pQ';
+$BOT_TOKEN = env('telegram.bot_key','7486843033:AAGX1CrQz1JDQRiixIe8-R_50_9Goms44pQ');
 return [
     'one'               => [
         'bot-url'     => "https://api.telegram.org/bot$BOT_TOKEN/", //绑定机器人地址
