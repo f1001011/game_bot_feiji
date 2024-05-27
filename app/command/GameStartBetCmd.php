@@ -37,7 +37,7 @@ class GameStartBetCmd extends Command
         //组装开牌信息
         $urls = []; //['url'=>['参数']
         $menu = BotBjlService::getInstance()->sendRrdBot();
-        $url  = config('telegram.bot-url');
+        $url  = config('telegram.bot-url').'sendPhoto';
 
         foreach ($list as $key => $value) {
             //解析

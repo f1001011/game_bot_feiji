@@ -1,8 +1,12 @@
 <?php
+
+$BOT_TOKEN = '7486843033:AAGX1CrQz1JDQRiixIe8-R_50_9Goms44pQ';
 return [
     'one'               => [
-        'bot-url'                           => 'https://api.telegram.org/botwebhook/', //发送消息到tg的接口地址
-        //        'bot-binding-red-string-one'     => 'tables_',
+        'bot-url'     => "https://api.telegram.org/bot$BOT_TOKEN/", //绑定机器人地址
+        'bot-binding-url-one'=>"https://tg_bot.bigtelegram.com/bot/webhook",//绑定接口地址
+
+        'bot-binding-red-string-one'     => 'tables_',
         'bot-binding-bjl-start-photo-one'   => 'static/12.png',//百家乐开始投注图片
         'bot-binding-bjl-open-photo-one'    => 'static/12.png',//百家乐结束投注图片
         'bot-binding-nn-start-photo-one'    => 'static/12.png',

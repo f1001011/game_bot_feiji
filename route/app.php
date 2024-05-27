@@ -18,7 +18,13 @@ Route::group('api', function () {
 });//->middleware(\app\middleware\TokenMiddleware::class);
 
 Route::group('api', function () {
-    //Route::rule('/');
+
 });
 
 
+
+
+ Route::rule('/bot/webhook','TelegramBot/webhook'); //机器人 回调消息地址
+ Route::rule('/bot/setWebhook','TelegramBot/setWebhook'); //机器人 绑定回调地址
+ Route::rule('/bot/getWebhookInfo','TelegramBot/getWebhookInfo'); //机器人 获取绑定信息
+ Route::rule('/bot/setDelete','TelegramBot/setDelete'); //机器人 删除绑定信息
