@@ -144,7 +144,7 @@ class BotBjlService extends BaseGameService
             $url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
             // 在这里处理你的响应，例如打印、存储等
             echo "Response for $url: \n" . $response . "\n\n";
-
+            traceLog(['url'=>$url,'$response'=>$response],'redis---curls---');
             // 清理句柄
             curl_multi_remove_handle($multiHandle, $ch);
             curl_close($ch);

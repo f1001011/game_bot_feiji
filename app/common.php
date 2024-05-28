@@ -108,3 +108,32 @@ function curlPost(string $url, array $post_data = [], $type = 'http_build_query'
     trace($data, 'info');
     return $data;
 }
+
+//开牌结果转汉字
+function pai_chinese(array $paiInfo): string
+{
+    $string = '';
+    if ($paiInfo['size'] == 0) {
+        $string .= '小|';
+    } elseif ($paiInfo['size'] == 1) {
+        $string .= '大|';
+    }
+    if ($paiInfo['zhuang_dui'] == true) {
+        $string .= '庄对|';
+    }
+
+    if ($paiInfo['xian_dui'] == true) {
+        $string .= '闲对|';
+    }
+    if ($paiInfo['lucky'] > 0) {
+        $string .= '幸运6|';
+    }
+    if ($paiInfo['win'] == 1) {
+        $string .= '庄赢|';
+    } elseif ($paiInfo['win'] == 2) {
+        $string .= '闲赢|';
+    } elseif ($paiInfo['win'] == 3) {
+        $string .= '和牌|';
+    }
+    return $string;
+}

@@ -13,7 +13,7 @@ use think\console\input\Option;
 use think\console\Output;
 use think\facade\Cache;
 
-class GameStartBetCmd extends Command
+class GameStartBetCmd extends BaseCommand
 {
     protected function configure()
     {
@@ -23,42 +23,41 @@ class GameStartBetCmd extends Command
     }
 
     protected function execute(Input $input, Output $output)
-    {   
+    {
         $redisKey = CacheKey::BOT_TELEGRAM_TABLE_SEND_INFO;
-        $num      = Cache::LLEN($redisKey);
+        $num = Cache::LLEN($redisKey);
         //   $array['xue_number']= 12;
-        //     $array['pu_number']= 3;
+        //     $array['pu_number']= 20;
         //     $array['countdown_time']= 45;
         //     $array['table_id']= 2;
         //      $array['start_time']= 1716772851;
         //       $array['game_type']= 3;
         //     Cache::RPUSH($redisKey,json_encode($array));
         //     die;
-            
+
         if ($num <= 0) {
             $output->writeln('gamestartbetcmd  ---目前没有开是信息---');
             return false;
         }
         $endNum = -1;
-        if ($num > 10){
-            $endNum = 10;
+        if ($num > 10) {
+            $endNum = 10-1;
         }
         //1 循环查询开牌信息
         $list = Cache::LRANGE($redisKey, 0, $endNum);
-         
+
         $redisKeyOn = CacheKey::BOT_TELEGRAM_TABLE_SEND_INFO_ON;
         //组装开牌信息
         $urls = []; //['url'=>['参数']
         $menu = BotBjlService::getInstance()->sendRrdBot();
-        $url  = config('telegram.one.bot-url').'sendPhoto';
+        $url = config('telegram.one.bot-url') . 'sendPhoto';
 
         foreach ($list as $key => $value) {
             //解析
             $array = [];
             $array = json_decode($value, true);
-            Cache::LREM($redisKey, 0, $value);
+            Cache::LPOP($redisKey);
             if (empty($array)) {
-                //Cache::LREM($redisKey, 0, $value);
                 continue;
             }
 
@@ -66,17 +65,14 @@ class GameStartBetCmd extends Command
             //1 获取发送到的 tg群  台座ID换 群ID
             //获取图片地址
             list($photoPath) = BotBjlService::getInstance()->verifySetSend($array['game_type']);
-           
+
             switch ($array['game_type']) {
                 case GameModel::BJL_TYPE://百家乐
                     $bjl_crowd = config('telegram.bjl_crowd');
-                 
-                    $crowdId   = array_search($array['table_id'], $bjl_crowd);
-                
+                    $crowdId = array_search($array['table_id'], $bjl_crowd);
                     if (!$crowdId) {
                         //不存在保存信息到其他key，并删除本次数据中的值
                         Cache::LPUSH($redisKeyOn, $value);
-                        Cache::LREM($redisKey, 0, $value);
 
                     } else {
                         //存在是 组装需要发送的 台座信息   百家乐台桌：1 开始投注。。靴/铺：12/2
@@ -85,11 +81,10 @@ class GameStartBetCmd extends Command
                     break;
                 case GameModel::LH_TYPE://龙虎斗
                     $lh_crowd = config('telegram.lh_crowd');
-                    $crowdId  = array_search($array['table_id'], $lh_crowd);
+                    $crowdId = array_search($array['table_id'], $lh_crowd);
                     if (!$crowdId) {
                         //不存在保存信息到其他key，并删除本次数据中的值
                         Cache::LPUSH($redisKeyOn, $value);
-                        Cache::LREM($redisKey, 0, $value);
 
                     } else {
                         //存在是 组装需要发送的 台座信息   龙虎斗台桌：1 开始投注。。靴/铺：12/2
@@ -99,11 +94,10 @@ class GameStartBetCmd extends Command
                     break;
                 case GameModel::NN_TYPE://牛牛
                     $nn_crowd = config('telegram.nn_crowd');
-                    $crowdId  = array_search($array['table_id'], $nn_crowd);
+                    $crowdId = array_search($array['table_id'], $nn_crowd);
                     if (!$crowdId) {
                         //不存在保存信息到其他key，并删除本次数据中的值
                         Cache::LPUSH($redisKeyOn, $value);
-                        Cache::LREM($redisKey, 0, $value);
 
                     } else {
                         //存在是 组装需要发送的 台座信息   牛牛台桌：1 开始投注。。靴/铺：12/2
@@ -112,11 +106,10 @@ class GameStartBetCmd extends Command
                     break;
                 case GameModel::THREE_TYPE://三公
                     $three_crowd = config('telegram.three_crowd');
-                    $crowdId     = array_search($array['table_id'], $three_crowd);
+                    $crowdId = array_search($array['table_id'], $three_crowd);
                     if (!$crowdId) {
                         //不存在保存信息到其他key，并删除本次数据中的值
                         Cache::LPUSH($redisKeyOn, $value);
-                        Cache::LREM($redisKey, 0, $value);
 
                     } else {
                         //存在是 组装需要发送的 台座信息   百家乐台桌：1 开始投注。。靴/铺：12/2
@@ -127,7 +120,7 @@ class GameStartBetCmd extends Command
 
         }
         //调用发送信息
-       
+
         BotBjlService::getInstance()->startSend($urls);
 
         // 指令输出
