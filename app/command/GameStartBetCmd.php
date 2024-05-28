@@ -23,21 +23,30 @@ class GameStartBetCmd extends Command
     }
 
     protected function execute(Input $input, Output $output)
-    {
+    {   
         $redisKey = CacheKey::BOT_TELEGRAM_TABLE_SEND_INFO;
         $num      = Cache::LLEN($redisKey);
+        //   $array['xue_number']= 12;
+        //     $array['pu_number']= 3;
+        //     $array['countdown_time']= 45;
+        //     $array['table_id']= 2;
+        //      $array['start_time']= 1716772851;
+        //       $array['game_type']= 3;
+        //     Cache::RPUSH($redisKey,json_encode($array));
+        //     die;
+            
         if ($num <= 0) {
-            $output->writeln('gamestartbetcmd  ---目前没有开始下注信息---');
+            $output->writeln('gamestartbetcmd  ---目前没有开是信息---');
             return false;
         }
-        //1 循环查询开拍信息
+        //1 循环查询开牌信息
         $list = Cache::LRANGE($redisKey, 0, -1);
-
+         
         $redisKeyOn = CacheKey::BOT_TELEGRAM_TABLE_SEND_INFO_ON;
         //组装开牌信息
         $urls = []; //['url'=>['参数']
         $menu = BotBjlService::getInstance()->sendRrdBot();
-        $url  = config('telegram.bot-url').'sendPhoto';
+        $url  = config('telegram.one.bot-url').'sendPhoto';
 
         foreach ($list as $key => $value) {
             //解析
@@ -50,11 +59,14 @@ class GameStartBetCmd extends Command
             $crowdId = '';
             //1 获取发送到的 tg群  台座ID换 群ID
             //获取图片地址
-            $photoPath = BotBjlService::getInstance()->verifySetSend($array['game_type']);
+            list($photoPath) = BotBjlService::getInstance()->verifySetSend($array['game_type']);
+           
             switch ($array['game_type']) {
                 case GameModel::BJL_TYPE://百家乐
                     $bjl_crowd = config('telegram.bjl_crowd');
+                 
                     $crowdId   = array_search($array['table_id'], $bjl_crowd);
+                
                     if (!$crowdId) {
                         //不存在保存信息到其他key，并删除本次数据中的值
                         Cache::LPUSH($redisKeyOn, $value);
@@ -109,6 +121,7 @@ class GameStartBetCmd extends Command
 
         }
         //调用发送信息
+       
         BotBjlService::getInstance()->startSend($urls);
 
         // 指令输出
@@ -123,7 +136,7 @@ class GameStartBetCmd extends Command
                 'chat_id'      => $crowdId,
                 'photo'        => new \CURLFile($photoPath),
                 'caption'      => "{$name}台桌：" . $array['table_id'] . ' 开始投注' . PHP_EOL
-                    . '靴/铺：' . $array['xue_num'] . '/' . $array['pu_num'] . PHP_EOL,
+                    . '靴/铺：' . $array['xue_number'] . '/' . $array['pu_number'] . PHP_EOL,
                 'reply_markup' => json_encode(['inline_keyboard' => $menu]),
             ],
             'redis_json' => $value

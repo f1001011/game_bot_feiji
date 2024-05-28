@@ -54,6 +54,7 @@ trait TelegramTrait
     
     protected function analysisBetResponse($json,$crowdId,$tgUser){
          $data = json_decode($json,true);
+        
         if ($data['code'] == 200){
             BotFacade::sendMessage($crowdId,$tgUser['username'].' 下注成功');
             return true;
