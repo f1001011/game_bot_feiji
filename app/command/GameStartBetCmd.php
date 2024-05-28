@@ -39,8 +39,12 @@ class GameStartBetCmd extends Command
             $output->writeln('gamestartbetcmd  ---目前没有开是信息---');
             return false;
         }
+        $endNum = -1;
+        if ($num > 10){
+            $endNum = 10;
+        }
         //1 循环查询开牌信息
-        $list = Cache::LRANGE($redisKey, 0, -1);
+        $list = Cache::LRANGE($redisKey, 0, $endNum);
          
         $redisKeyOn = CacheKey::BOT_TELEGRAM_TABLE_SEND_INFO_ON;
         //组装开牌信息
@@ -52,10 +56,12 @@ class GameStartBetCmd extends Command
             //解析
             $array = [];
             $array = json_decode($value, true);
+            Cache::LREM($redisKey, 0, $value);
             if (empty($array)) {
-                Cache::LREM($redisKey, 0, $value);
+                //Cache::LREM($redisKey, 0, $value);
                 continue;
             }
+
             $crowdId = '';
             //1 获取发送到的 tg群  台座ID换 群ID
             //获取图片地址

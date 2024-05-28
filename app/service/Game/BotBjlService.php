@@ -45,7 +45,7 @@ class BotBjlService extends BaseGameService
             $res['rate_id'] = GameModel::BJL_ODDS[$value[0]];//查询游戏配率ID
 
             //4 组装下注信息
-            $res['money'] = $value[1];
+            $res['money'] = abs($value[1]);
             $post['bet'][] = $res;
         }
 
