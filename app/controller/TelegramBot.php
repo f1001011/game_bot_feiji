@@ -119,7 +119,7 @@ class TelegramBot extends BaseApiController
             BotCrowdListService::getInstance()->botCrowdBind($data);
             return true;
         }
-        //判断是否是新消息。机器人被踢出房间消息
+        //判断是否是新消息。机器人被踢出房间消息K
         if (!empty($request['my_chat_member']) && $request['my_chat_member']['old_chat_member']['user']['is_bot']) {
             $message = $request['my_chat_member'];
 
