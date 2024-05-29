@@ -26,8 +26,8 @@ class GameStartBetCmd extends BaseCommand
     {
         $redisKey = CacheKey::BOT_TELEGRAM_TABLE_SEND_INFO;
         $num = Cache::LLEN($redisKey);
-        //   $array['xue_number']= 12;
-        //     $array['pu_number']= 20;
+        //   $array['xue_number']= 4;
+        //     $array['pu_number']= 3;
         //     $array['countdown_time']= 45;
         //     $array['table_id']= 2;
         //      $array['start_time']= 1716772851;
@@ -40,9 +40,9 @@ class GameStartBetCmd extends BaseCommand
             return false;
         }
         $endNum = -1;
-        if ($num > 10) {
-            $endNum = 10-1;
-        }
+//        if ($num > 10) {
+//            $endNum = 10-1;
+//        }
         //1 循环查询开牌信息
         $list = Cache::LRANGE($redisKey, 0, $endNum);
 

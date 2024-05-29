@@ -18,42 +18,39 @@ class GameOpenCmd extends BaseCommand
     protected function configure()
     {
         // 指令配置
-        $this->setName('gamestartbetcmd')
-            ->setDescription('the gamestartbetcmd command');
+        $this->setName('gameopencmd')
+            ->setDescription('the gameopencmd command');
     }
 
     protected function execute(Input $input, Output $output)
     {
         $redisKey = CacheKey::BOT_TELEGRAM_TABLE_OPEN_INFO;
         $num      = Cache::LLEN($redisKey);
-//
-//        $arr = [
-//            'size'=>0,
-//            'zhuang_dui'=>true,
-//            'xian_dui'=>true,
-//            'lucky'=>0,
-//            'win'=>3,
-//            'xue_number'=>1,
-//            'pu_number'=>1,
-//            'countdown_time'=>45,
-//            'table_id'=>2,
-//            'start_time'=>1716772851,
-//            'game_type'=>3,
-//        ];
+    
+//         $arr = [
+//             'xue_number'=>1,
+//             'pu_number'=>16,
+//             'countdown_time'=>45,
+//             'table_id'=>2,
+//             'start_time'=>1716772851,
+//             'game_type'=>3,
+//             'pai_result'=>['size'=>0,'zhuang_dui'=>true,'xian_dui'=>true,'lucky'=>0,'win'=>3,]
+//         ];
 //             Cache::RPUSH($redisKey,json_encode($arr));
-//             die;
+// die;
 
         if ($num <= 0) {
-            $output->writeln('gamestartbetcmd start ---目前没有开牌信息---');
+            $output->writeln('gameopencmd start ---目前没有开牌信息---');
             return false;
         }
         $endNum = -1;
-        if ($num > 10){
-            $endNum = 10-1;
-        }
+        // if ($num > 10){
+        //     $endNum = 10-1;
+        // }
         //1 循环查询开牌信息
         $list = Cache::LRANGE($redisKey, 0, $endNum);
 
+        
         $redisKeyOn = CacheKey::BOT_TELEGRAM_TABLE_OPEN_INFO_ON;
         //组装开牌信息
         $urls = []; //['url'=>['参数']
@@ -71,7 +68,7 @@ class GameOpenCmd extends BaseCommand
             $crowdId = '';
             //1 获取发送到的 tg群  台座ID换 群ID
             //获取图片地址
-            $photoPath = BotBjlService::getInstance()->verifySetSend($array['game_type'], true);
+            list($photoPath) = BotBjlService::getInstance()->verifySetSend($array['game_type'], true);
 
             switch ($array['game_type']) {
                 case GameModel::BJL_TYPE://百家乐
@@ -122,11 +119,11 @@ class GameOpenCmd extends BaseCommand
 
         }
         //调用发送信息
-
+     
         BotBjlService::getInstance()->startSend($urls);
 
         // 指令输出
-        $output->writeln('gamestartbetcmd end');
+        $output->writeln('gameopencmd end');
     }
 
     public function requestData($url, $crowdId, $photoPath, $menu, $value, $array, $name = '百家乐')
@@ -138,7 +135,8 @@ class GameOpenCmd extends BaseCommand
                 'chat_id'      => $crowdId,
                 'photo'        => new \CURLFile($photoPath),
                 'caption'      => "{$name}台桌：" . $array['table_id'] . ' 结束下注' . PHP_EOL
-                    . '靴/铺：' . $array['xue_number'] . '/' . $array['pu_number'] . PHP_EOL. $string,
+                    . '靴/铺：' . $array['xue_number'] . '/' . $array['pu_number'] . PHP_EOL
+                    .'开牌结果：'. $string,
                 'reply_markup' => json_encode(['inline_keyboard' => $menu]),
             ],
             'redis_json' => $value
