@@ -5,6 +5,7 @@ namespace app\command;
 
 use app\common\CacheKey;
 use app\model\GameModel;
+use app\service\Game\BaseGameService;
 use app\service\Game\BotBjlService;
 use think\console\Command;
 use think\console\Input;
@@ -121,7 +122,7 @@ class GameStartBetCmd extends BaseCommand
         }
         //调用发送信息
 
-        BotBjlService::getInstance()->startSend($urls);
+        BaseGameService::getInstance()->startSend($urls);
 
         // 指令输出
         $output->writeln('gamestartbetcmd end');

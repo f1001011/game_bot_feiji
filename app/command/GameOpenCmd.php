@@ -5,6 +5,7 @@ namespace app\command;
 
 use app\common\CacheKey;
 use app\model\GameModel;
+use app\service\Game\BaseGameService;
 use app\service\Game\BotBjlService;
 use think\console\Command;
 use think\console\Input;
@@ -120,7 +121,7 @@ class GameOpenCmd extends BaseCommand
         }
         //调用发送信息
      
-        BotBjlService::getInstance()->startSend($urls);
+        BaseGameService::getInstance()->openEndSend($urls);
 
         // 指令输出
         $output->writeln('gameopencmd end');
@@ -128,7 +129,11 @@ class GameOpenCmd extends BaseCommand
 
     public function requestData($url, $crowdId, $photoPath, $menu, $value, $array, $name = '百家乐')
     {
-        $string = pai_chinese($array['pai_result']);
+        //判断是那个游戏，。然后 调取那个游戏的 牌型
+        $string = '';
+        if ($name == '百家乐'){
+            $string = pai_chinese($array['pai_result']);
+        }
         return [
             'url'        => $url,
             'data'       => [
