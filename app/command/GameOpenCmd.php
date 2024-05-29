@@ -26,17 +26,25 @@ class GameOpenCmd extends BaseCommand
     {
         $redisKey = CacheKey::BOT_TELEGRAM_TABLE_OPEN_INFO;
         $num      = Cache::LLEN($redisKey);
-        //   $array['xue_number']= 1;
-        //     $array['pu_number']= 13;
-        //     $array['countdown_time']= 45;
-        //     $array['table_id']= 2;
-        //      $array['start_time']= 1716772851;
-        //       $array['game_type']= 3;
-        //     Cache::RPUSH($redisKey,json_encode($array));
-        //     die;
+//
+//        $arr = [
+//            'size'=>0,
+//            'zhuang_dui'=>true,
+//            'xian_dui'=>true,
+//            'lucky'=>0,
+//            'win'=>3,
+//            'xue_number'=>1,
+//            'pu_number'=>1,
+//            'countdown_time'=>45,
+//            'table_id'=>2,
+//            'start_time'=>1716772851,
+//            'game_type'=>3,
+//        ];
+//             Cache::RPUSH($redisKey,json_encode($arr));
+//             die;
 
         if ($num <= 0) {
-            $output->writeln('gamestartbetcmd  ---目前没有开是信息---');
+            $output->writeln('gamestartbetcmd start ---目前没有开牌信息---');
             return false;
         }
         $endNum = -1;
@@ -118,7 +126,7 @@ class GameOpenCmd extends BaseCommand
         BotBjlService::getInstance()->startSend($urls);
 
         // 指令输出
-        $output->writeln('gamestartbetcmd');
+        $output->writeln('gamestartbetcmd end');
     }
 
     public function requestData($url, $crowdId, $photoPath, $menu, $value, $array, $name = '百家乐')

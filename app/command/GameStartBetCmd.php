@@ -36,7 +36,7 @@ class GameStartBetCmd extends BaseCommand
         //     die;
 
         if ($num <= 0) {
-            $output->writeln('gamestartbetcmd  ---目前没有开是信息---');
+            $output->writeln('gamestartbetcmd  start---目前没有开是信息---');
             return false;
         }
         $endNum = -1;
@@ -124,7 +124,7 @@ class GameStartBetCmd extends BaseCommand
         BotBjlService::getInstance()->startSend($urls);
 
         // 指令输出
-        $output->writeln('gamestartbetcmd');
+        $output->writeln('gamestartbetcmd end');
     }
 
     public function requestData($url, $crowdId, $photoPath, $menu, $value, $array, $name = '百家乐')
