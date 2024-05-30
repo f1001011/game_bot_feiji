@@ -2,6 +2,7 @@
 
 
 需要执行 2个命令
+            如果用sh执行计划任务添加 /bin/bash /www/wwwroot/tg_bot.bigtelegram.com/geek_tg_feiji/script.sh
                 php think  gamestartbetcmd  牌局开始信号
                 php think  gameopencmd      牌局开牌信号
                 可加入 牌局结束信息（未写）

@@ -6,9 +6,6 @@ use app\facade\BotFacade;
 use app\service\BotCrowdListService;
 use app\service\BotSendService;
 use app\service\Game\BotBjlService;
-use app\service\Game\BotLhService;
-use app\service\Game\BotNnService;
-use app\service\Game\BotThreeService;
 
 class TelegramBot extends BaseApiController
 {
@@ -61,35 +58,37 @@ class TelegramBot extends BaseApiController
         //判断是否新用户加入群中,是的话绑定用户到群 建立数据库 用户加入房间数据库
 
 
-//        if (empty($request) || empty($request['callback_query']['message'])) {
-//            // 消息体错误
-//            traceLog($request, 'red-webhook-error');
-//            fail();
-//        }
-//
-//        //响应成功
-//        //获取群ID
-//        $data = $request['callback_query'];
-//        $messageId = $data['message']['message_id'];//消息ID
-//        $crowd = $data['message']['chat']['id'];//群ID
-//        $command = $data['data'];//输入命令
-//        $tgId = $data['from']['id'];//用户的tgId
-//        traceLog(['message_id' => $messageId, 'crowd' => $crowd, 'command' => $command,], 'red-webhook-data');
-//        //1 判断输入的命令/
-//        //获取群号判断是 那个游戏
-//        if ($crowd == '百家乐群号'){
-//            //调用百家乐游戏下注
-//        }
-//
-//        if ($crowd == '龙湖斗群号'){
-//
-//        }
-//        if ($crowd == '三公'){
-//
-//        }
-//        if ($crowd == '牛牛'){
-//
-//        }
+
+
+        if (empty($request) || empty($request['callback_query']['message'])) {
+            // 消息体错误
+            traceLog($request, 'red-webhook-error');
+            fail();
+        }
+
+        //响应成功
+        //获取群ID
+        $data = $request['callback_query'];
+        $messageId = $data['message']['message_id'];//消息ID
+        $crowd = $data['message']['chat']['id'];//群ID
+        $command = $data['data'];//输入命令
+        $tgId = $data['from']['id'];//用户的tgId
+        traceLog(['message_id' => $messageId, 'crowd' => $crowd, 'command' => $command,], 'red-webhook-data');
+        //1 判断输入的命令/
+        //获取群号判断是 那个游戏
+        if ($crowd == '百家乐群号'){
+            //调用百家乐游戏下注
+        }
+
+        if ($crowd == '龙湖斗群号'){
+
+        }
+        if ($crowd == '三公'){
+
+        }
+        if ($crowd == '牛牛'){
+
+        }
 
 
         //如果是接龙红包
@@ -119,7 +118,7 @@ class TelegramBot extends BaseApiController
             BotCrowdListService::getInstance()->botCrowdBind($data);
             return true;
         }
-        //判断是否是新消息。机器人被踢出房间消息K
+        //判断是否是新消息。机器人被踢出房间消息
         if (!empty($request['my_chat_member']) && $request['my_chat_member']['old_chat_member']['user']['is_bot']) {
             $message = $request['my_chat_member'];
 
@@ -184,19 +183,19 @@ class TelegramBot extends BaseApiController
 
         $nn_crowd = config('telegram.nn_crowd');
         if ($chat['id'] == isset($nn_crowd[$chat['id']])){
-            BotNnService::getInstance()->Betting($command,$chat['id'],$from);
+
         }
 
         $three_crowd = config('telegram.three_crowd');
         if ($chat['id'] == isset($three_crowd[$chat['id']])){
-            BotThreeService::getInstance()->Betting($command,$chat['id'],$from);
+
         }
 
         $lh_crowd = config('telegram.lh_crowd');
         if ($chat['id'] == isset($lh_crowd[$chat['id']])){
-            BotLhService::getInstance()->Betting($command,$chat['id'],$from);
+
         }
-        return;
+
     }
 
 }

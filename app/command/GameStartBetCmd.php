@@ -5,7 +5,6 @@ namespace app\command;
 
 use app\common\CacheKey;
 use app\model\GameModel;
-use app\service\Game\BaseGameService;
 use app\service\Game\BotBjlService;
 use think\console\Command;
 use think\console\Input;
@@ -25,6 +24,20 @@ class GameStartBetCmd extends BaseCommand
 
     protected function execute(Input $input, Output $output)
     {
+        $date = date('yY-m-d H:i:s').'---'.REQUEST_ID;
+        $CacheEndKey = sprintf(CacheKey::BOT_TELEGRAM_CACHE_END,'gamestartbetcmd');
+        register_shutdown_function(function ()use ($CacheEndKey){
+            Cache::delete($CacheEndKey);
+        });
+        if (Cache::get($CacheEndKey)){
+            $output->writeln($date.'g---amestartbetcmd  ---正在执行任务中---');
+            die;
+        }
+        Cache::set($CacheEndKey,'gamestartbetcmd',10);
+
+
+
+
         $redisKey = CacheKey::BOT_TELEGRAM_TABLE_SEND_INFO;
         $num = Cache::LLEN($redisKey);
         //   $array['xue_number']= 4;
@@ -37,13 +50,13 @@ class GameStartBetCmd extends BaseCommand
         //     die;
 
         if ($num <= 0) {
-            $output->writeln('gamestartbetcmd  start---目前没有开是信息---');
+            $output->writeln($date.'---gamestartbetcmd  start---目前没有开始信息---');
             return false;
         }
         $endNum = -1;
-//        if ($num > 10) {
-//            $endNum = 10-1;
-//        }
+        if ($num > 10) {
+            $endNum = 10-1;
+        }
         //1 循环查询开牌信息
         $list = Cache::LRANGE($redisKey, 0, $endNum);
 
@@ -122,10 +135,10 @@ class GameStartBetCmd extends BaseCommand
         }
         //调用发送信息
 
-        BaseGameService::getInstance()->startSend($urls);
+        BotBjlService::getInstance()->startSend($urls);
 
         // 指令输出
-        $output->writeln('gamestartbetcmd end');
+        $output->writeln($date.'---gamestartbetcmd end');
     }
 
     public function requestData($url, $crowdId, $photoPath, $menu, $value, $array, $name = '百家乐')
