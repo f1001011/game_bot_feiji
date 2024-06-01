@@ -26,7 +26,6 @@ class GameOpenCmd extends BaseCommand
     {
 
         $date = date('yY-m-d H:i:s').'---'.REQUEST_ID;
-        do {
             $CacheEndKey = sprintf(CacheKey::BOT_TELEGRAM_CACHE_END, 'gameopencmd');
             register_shutdown_function(function () use ($CacheEndKey) {
                 Cache::delete($CacheEndKey);
@@ -136,8 +135,6 @@ class GameOpenCmd extends BaseCommand
             BotBjlService::getInstance()->startSend($urls);
             // 指令输出
             $output->writeln("{$date}---gameopencmd end");
-            sleep(3);
-        } while (true);
     }
 
     public function requestData($url, $crowdId, $photoPath, $menu, $value, $array, $name = '百家乐')

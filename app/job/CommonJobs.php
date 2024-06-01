@@ -28,7 +28,7 @@ class CommonJobs
         if (!isset($name)) {
             return true;
         }
-        traceLog($name . ' 开始执行任务---' . $name . '---START');
+        traceLogs($name . ' 开始执行任务---' . $name . '---START');
         //判断需要执行的命令
         switch ($name) {//
             case JobKey::BJL_OPEN:
