@@ -30,12 +30,19 @@ class CommonJobs
         }
         traceLogs($name . ' 开始执行任务---' . $name . '---START');
         //判断需要执行的命令
+        //$data =['table_id'=>2,'game_type'=>3,'start_time'=>198090,'countdown_time'=>45];
+        //计算剩下多少秒
+        //$time = time() - ($data['start_time'] + $data['countdown_time']);
+
         switch ($name) {//
             case JobKey::BJL_OPEN:
                 break;
 
             case JobKey::BJL_START:
-                    //百家乐开始信息
+                    //开始信息
+                break;
+            case JobKey::BJL_END:   //停止下注信息
+
                 break;
             case JobKey::NN_OPEN:
 
